@@ -1,0 +1,10 @@
+{
+    "user@host1": [
+        "service1",
+        "service2"
+    ],
+    "user@host2": [
+        "service3",
+        "service4"
+    ]
+}
