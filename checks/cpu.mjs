@@ -1,3 +1,6 @@
+// Threshold constants
+const CPU_USAGE_THRESHOLD = 75;
+
 export async function checkCPU(params) {
   const { host, username, db, sshExec, log, sendMessage } = params;
   const table = `${host.replace(/\W/g, '_')}_cpu`;
@@ -26,7 +29,7 @@ export async function checkCPU(params) {
     return;
   }
   await db.query(`INSERT INTO \`${table}\` (cpu_pct) VALUES (?)`, [cpuUsage]);
-  if (cpuUsage > 75) {
+  if (cpuUsage > CPU_USAGE_THRESHOLD) {
     // Run 2 more checks in a single SSH connection with sleeps
     const checkCmd = `sleep 1 && top -bn1 | grep 'Cpu(s)'; sleep 3; sleep 1 && top -bn1 | grep 'Cpu(s)';`;
     const [{ result: multiOutput }] = await sshExec({ host, username, commands: [checkCmd] });
@@ -41,20 +44,24 @@ export async function checkCPU(params) {
         }
       });
       log.debug(`High CPU recheck sample for ${host}:`, { sample, checkUsage });
-      if (checkUsage == null || checkUsage <= 75) {
+      if (checkUsage == null || checkUsage <= CPU_USAGE_THRESHOLD) {
         consistent = false;
         break;
       }
     }
     if (consistent && samples.length >= 2) {
-      const msg = `High CPU usage on ${host}: CPU usage is above 75% consistently.`;
+      const msg = `High CPU usage on ${host}: CPU usage is above ${CPU_USAGE_THRESHOLD}% consistently.`;
       log.warn(msg, { host });
       await sendMessage({
         body: {
           embeds: [{
             title: 'High CPU Usage',
             description: msg,
-            color: 0xffa500
+            color: 0xffa500,
+            fields: [
+              { name: 'CPU Usage (%)', value: cpuUsage.toFixed(2), inline: true },
+              { name: 'Threshold (%)', value: CPU_USAGE_THRESHOLD.toString(), inline: true }
+            ]
           }]
         }
       });

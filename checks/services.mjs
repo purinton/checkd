@@ -20,7 +20,10 @@ export async function checkServices(params) {
         embeds: [{
           title: 'Failed Services',
           description: msg,
-          color: 0xff0000
+          color: 0xff0000,
+          fields: [
+            { name: 'Host', value: host, inline: true }
+          ]
         }]
       }
     });
@@ -41,7 +44,11 @@ export async function checkServices(params) {
               embeds: [{
                 title: 'Service Not Active',
                 description: msg,
-                color: 0xffa500
+                color: 0xffa500,
+                fields: [
+                  { name: 'Service', value: service, inline: true },
+                  { name: 'Host', value: host, inline: true }
+                ]
               }]
             }
           });

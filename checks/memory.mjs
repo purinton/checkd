@@ -1,3 +1,6 @@
+// Threshold constants
+const MEMORY_USAGE_THRESHOLD = 90;
+
 export async function checkMemory(params) {
   const { host, username, db, sshExec, log, sendMessage } = params;
   const table = `${host.replace(/\W/g, '_')}_memory`;
@@ -14,7 +17,7 @@ export async function checkMemory(params) {
       const pctFree = total > 0 ? (free / total) * 100 : 0;
       log.debug(`Parsed memory usage for ${host}:`, { total, used, free, pctUsed, pctFree, line: lines[1] });
       await db.query(`INSERT INTO \`${table}\` (total, used, free, pct_used, pct_free) VALUES (?, ?, ?, ?, ?)`, [total, used, free, pctUsed, pctFree]);
-      if (pctUsed > 90) {
+      if (pctUsed > MEMORY_USAGE_THRESHOLD) {
         const msg = `High memory usage on ${host}: ${pctUsed}% used.`;
         log.warn(msg, { host });
         await sendMessage({
@@ -22,7 +25,11 @@ export async function checkMemory(params) {
             embeds: [{
               title: 'High Memory Usage',
               description: msg,
-              color: 0xffa500
+              color: 0xffa500,
+              fields: [
+                { name: 'Used (%)', value: pctUsed.toFixed(2), inline: true },
+                { name: 'Threshold (%)', value: MEMORY_USAGE_THRESHOLD.toString(), inline: true }
+              ]
             }]
           }
         });

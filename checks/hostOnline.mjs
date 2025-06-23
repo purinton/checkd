@@ -11,7 +11,10 @@ export async function checkHostOnline(params) {
         embeds: [{
           title: 'Host Offline',
           description: msg,
-          color: 0xff0000
+          color: 0xff0000,
+          fields: [
+            { name: 'Host', value: host, inline: true }
+          ]
         }]
       }
     });

@@ -1,3 +1,6 @@
+// Threshold constants
+const DISK_USAGE_THRESHOLD = 95;
+
 export async function checkDisk(params) {
   const { host, username, db, sshExec, log, sendMessage } = params;
   const table = `${host.replace(/\W/g, '_')}_disk`;
@@ -15,7 +18,7 @@ export async function checkDisk(params) {
         const pctFree = total > 0 ? (free / total) * 100 : 0;
         log.debug(`Parsed disk usage for ${host}:`, { mount, used, free, total, pctUsed, pctFree, line });
         db.query(`INSERT INTO \`${table}\` (mount, used, free, total, pct_used, pct_free) VALUES (?, ?, ?, ?, ?, ?)`, [mount, used, free, total, pctUsed, pctFree]);
-        if (pctUsed > 95 && !mount.includes('squashfs')) {
+        if (pctUsed > DISK_USAGE_THRESHOLD && !mount.includes('squashfs')) {
           const msg = `High disk usage on ${host}: ${mount} is ${pctUsed}% used.`;
           log.warn(msg, { host, mount });
           await sendMessage({
@@ -23,7 +26,12 @@ export async function checkDisk(params) {
               embeds: [{
                 title: 'High Disk Usage',
                 description: msg,
-                color: 0xffa500
+                color: 0xffa500,
+                fields: [
+                  { name: 'Mount', value: mount, inline: true },
+                  { name: 'Used (%)', value: pctUsed.toFixed(2), inline: true },
+                  { name: 'Threshold (%)', value: DISK_USAGE_THRESHOLD.toString(), inline: true }
+                ]
               }]
             }
           });

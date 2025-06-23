@@ -1,8 +1,10 @@
+// Threshold constants
+const NETWORK_IO_THRESHOLD_BPS = 400 * 1000 * 1000 / 8; // 400Mbps in bytes/sec
+
 export async function checkNetworkIO(params) {
   const { host, username, db, sshExec, log, sendMessage } = params;
   const table = `${host.replace(/\W/g, '_')}_networkio`;
   await db.query(`CREATE TABLE IF NOT EXISTS \`${table}\` (id INT AUTO_INCREMENT PRIMARY KEY, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, iface VARCHAR(64), rx_rate BIGINT, tx_rate BIGINT)`);
-  const threshold = 400 * 1000 * 1000 / 8;
   // Initial sample
   const [{ result: first }] = await sshExec({ host, username, commands: ['cat /proc/net/dev'] });
   if (process.env.NODE_ENV !== 'test') {
@@ -31,7 +33,7 @@ export async function checkNetworkIO(params) {
       const txRate = (secondStats[iface].tx - firstStats[iface].tx) / 3;
       log.debug(`Parsed network IO for ${host}:`, { iface, rxRate, txRate, first: firstStats[iface], second: secondStats[iface] });
       db.query(`INSERT INTO \`${table}\` (iface, rx_rate, tx_rate) VALUES (?, ?, ?)`, [iface, rxRate, txRate]);
-      if (rxRate > threshold || txRate > threshold) sampleHigh = true;
+      if (rxRate > NETWORK_IO_THRESHOLD_BPS || txRate > NETWORK_IO_THRESHOLD_BPS) sampleHigh = true;
     }
   }));
   if (sampleHigh) {
@@ -50,7 +52,7 @@ export async function checkNetworkIO(params) {
           const rxRate = (stats2[iface].rx - stats1[iface].rx) / 3;
           const txRate = (stats2[iface].tx - stats1[iface].tx) / 3;
           log.debug(`High network IO recheck for ${host}:`, { iface, rxRate, txRate, stats1: stats1[iface], stats2: stats2[iface] });
-          if (rxRate > threshold || txRate > threshold) foundHigh = true;
+          if (rxRate > NETWORK_IO_THRESHOLD_BPS || txRate > NETWORK_IO_THRESHOLD_BPS) foundHigh = true;
         }
       });
       if (!foundHigh) {
@@ -66,7 +68,10 @@ export async function checkNetworkIO(params) {
           embeds: [{
             title: 'High Network IO',
             description: msg,
-            color: 0xffa500
+            color: 0xffa500,
+            fields: [
+              { name: 'Threshold (Bps)', value: NETWORK_IO_THRESHOLD_BPS.toString(), inline: true }
+            ]
           }]
         }
       });

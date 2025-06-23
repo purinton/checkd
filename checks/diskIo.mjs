@@ -1,3 +1,6 @@
+// Threshold constants
+const DISK_IO_UTIL_THRESHOLD = 80;
+
 export async function checkDiskIO(params) {
   const { host, username, db, sshExec, log, sendMessage } = params;
   const table = `${host.replace(/\W/g, '_')}_diskio`;
@@ -17,7 +20,7 @@ export async function checkDiskIO(params) {
       log.debug(`Parsed disk IO for ${host}:`, { device, util, line });
       if (!isNaN(util)) {
         db.query(`INSERT INTO \`${table}\` (device, util_pct) VALUES (?, ?)`, [device, util]);
-        if (util > 80) sampleHigh = true;
+        if (util > DISK_IO_UTIL_THRESHOLD) sampleHigh = true;
       }
     }
   }));
@@ -34,7 +37,7 @@ export async function checkDiskIO(params) {
         if (parts.length >= 23) {
           const util = parseFloat(parts[22]);
           log.debug(`High disk IO recheck for ${host}:`, { line, util });
-          if (!isNaN(util) && util > 80) foundHigh = true;
+          if (!isNaN(util) && util > DISK_IO_UTIL_THRESHOLD) foundHigh = true;
         }
       });
       if (!foundHigh) {
@@ -43,14 +46,17 @@ export async function checkDiskIO(params) {
       }
     }
     if (allHigh && samples.length >= 2) {
-      const msg = `High disk IO on ${host}: Device(s) above 80% utilization for 3 consecutive samples.`;
+      const msg = `High disk IO on ${host}: Device(s) above ${DISK_IO_UTIL_THRESHOLD}% utilization for 3 consecutive samples.`;
       log.warn(msg, { host });
       await sendMessage({
         body: {
           embeds: [{
             title: 'High Disk IO',
             description: msg,
-            color: 0xffa500
+            color: 0xffa500,
+            fields: [
+              { name: 'Utilization Threshold (%)', value: DISK_IO_UTIL_THRESHOLD.toString(), inline: true }
+            ]
           }]
         }
       });

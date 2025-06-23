@@ -1,3 +1,4 @@
+// No thresholds for xcpAlerts, but update embed to include host and message as inline fields
 export async function checkXCPAlerts(params) {
   const { host, username, sshExec, log, sendMessage } = params;
   // Batch all priority message-list commands
@@ -20,7 +21,11 @@ export async function checkXCPAlerts(params) {
           embeds: [{
             title: priorityTitles[i],
             description: msg,
-            color: priorityColors[i]
+            color: priorityColors[i],
+            fields: [
+              { name: 'Host', value: host, inline: true },
+              { name: 'Message', value: output, inline: true }
+            ]
           }]
         }
       });
@@ -60,7 +65,11 @@ export async function checkXCPAlerts(params) {
             embeds: [{
               title: 'XCP Notice',
               description: msg,
-              color: 0x00bfff
+              color: 0x00bfff,
+              fields: [
+                { name: 'Host', value: host, inline: true },
+                { name: 'Message', value: message, inline: true }
+              ]
             }]
           }
         });
