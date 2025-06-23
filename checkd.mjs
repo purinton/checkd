@@ -38,7 +38,7 @@ async function checkServer(db, userAtHost, services) {
 
 async function runAllChecks(db) {
     const configFile = path(import.meta, 'servers.json');
-    const config = JSON.parse(fs.readFile(configFile, 'utf8'));
+    const config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
     await Promise.all(
         Object.entries(config).map(([userAtHost, services]) =>
             checkServer(db, userAtHost, services)
