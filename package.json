@@ -1,7 +1,7 @@
 {
     "name": "@purinton/checkd",
     "type": "module",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Node.js server monitoring and alerting tool. Runs checks (CPU, disk, memory, network, services, XCP alerts) on remote hosts via SSH, logs results to MySQL, and sends alerts to Discord.",
     "main": "checkd.mjs",
     "scripts": {
