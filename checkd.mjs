@@ -16,7 +16,7 @@ import { checkXCPAlerts } from './checks/xcpAlerts.mjs';
 import { checkHostOnline } from './checks/hostOnline.mjs';
 
 async function checkServer(db, userAtHost, services) {
-    const { username, host } = userAtHost.split('@');
+    const [username, host] = userAtHost.split('@');
     const params = { username, host, services, log, db, sshExec, sendMessage };
     try {
         const online = await checkHostOnline(params);
@@ -28,7 +28,7 @@ async function checkServer(db, userAtHost, services) {
         await checkDiskIO(params);
         await checkNetworkIO(params);
         await checkLoadAverages(params);
-        if (host.includes('xcp')) {
+        if (host && host.includes('xcp')) {
             await checkXCPAlerts(params);
         }
     } catch (e) {
