@@ -56,8 +56,11 @@ if (process.env.NODE_ENV !== 'test') {
 
     cron.schedule('*/10 * * * *', async () => {
         await runAllChecks(db);
-        await log('info', 'Checks completed by cron schedule.');
+        log.info('Scheduled checks completed');
     });
 
+    log.info('Checks scheduled every 10 minutes');
+
+    // Keep the process running
     process.stdin.resume();
 }
