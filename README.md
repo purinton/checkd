@@ -2,7 +2,7 @@
 
 ## @purinton/checkd [![npm version](https://img.shields.io/npm/v/@purinton/checkd.svg)](https://www.npmjs.com/package/@purinton/checkd)[![license](https://img.shields.io/github/license/purinton/checkd.svg)](LICENSE)[![build status](https://github.com/purinton/checkd/actions/workflows/nodejs.yml/badge.svg)](https://github.com/purinton/checkd/actions)
 
-A starter template for new Node.js projects. Use this as a foundation for your next application or service.
+A Node.js server monitoring and alerting tool. Runs checks (CPU, disk, memory, network, services, XCP alerts) on remote hosts via SSH, logs results to MySQL, and sends alerts to Discord.
 
 ---
 
@@ -21,12 +21,16 @@ A starter template for new Node.js projects. Use this as a foundation for your n
 - Pre-configured for Node.js (ESM)
 - Environment variable support via dotenv
 - Logging and signal handling via `@purinton/common`
+- SSH-based remote checks for CPU, disk, memory, network, services, and XCP alerts
+- Results stored in MySQL
+- Discord webhook alerting for failures and warnings
+- Cron-based scheduling (every 10 minutes by default)
 - Jest for testing
 - MIT License
 
 ## Getting Started
 
-1. **Clone this template:**
+1. **Clone this repository:**
 
    ```bash
    git clone https://github.com/purinton/checkd.git your-project-name
@@ -41,13 +45,17 @@ A starter template for new Node.js projects. Use this as a foundation for your n
    - Update this `README.md` as needed
    - Change the license if required
 
+3. **Configure servers:**
+   - Copy `servers.json.example` to `servers.json` and edit with your hosts and services.
+   - Set up your `.env` file with required environment variables (see `.env.example` if available).
+
 ## Development
 
-- Main entry: `project.mjs`
+- Main entry: `checkd.mjs`
 - Start your app:
 
   ```bash
-  node project.mjs
+  node checkd.mjs
   ```
 
 - Add your code in new files and import as needed.
@@ -60,7 +68,7 @@ A starter template for new Node.js projects. Use this as a foundation for your n
   npm test
   ```
 
-- Add your tests in the `__tests__` folder or alongside your code.
+- Add your tests in the `tests/` folder or alongside your code.
 
 ## Customization
 
