@@ -1,29 +1,27 @@
 {
-    "name": "@purinton/project-template",
+    "name": "@purinton/checkd",
     "type": "module",
     "version": "1.0.0",
     "description": "A template for starting new Node.js projects.",
-    "main": "project-template.mjs",
+    "main": "checkd.mjs",
     "scripts": {
-        "start": "node project-template.mjs",
+        "start": "node checkd.mjs",
         "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/purinton/project-template.git"
+        "url": "git+https://github.com/purinton/checkd.git"
     },
     "keywords": [
-        "project-template",
-        "nodejs",
-        "starter",
-        "template"
+        "checkd",
+        "nodejs"
     ],
     "author": "Russell Purinton <russell@purinton.us>",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/purinton/project-template/issues"
+        "url": "https://github.com/purinton/checkd/issues"
     },
-    "homepage": "https://github.com/purinton/project-template#readme",
+    "homepage": "https://github.com/purinton/checkd#readme",
     "devDependencies": {
         "jest": "^30.0.2"
     },
